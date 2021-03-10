@@ -8,10 +8,12 @@ import br.com.armando.efficienttraining.api.model.TaskSummaryModel;
 import br.com.armando.efficienttraining.api.model.input.TaskInput;
 import br.com.armando.efficienttraining.domain.model.Project;
 import br.com.armando.efficienttraining.domain.model.Task;
+import br.com.armando.efficienttraining.domain.repository.TaskRepository;
 import br.com.armando.efficienttraining.domain.service.ProjectRegisterService;
 import br.com.armando.efficienttraining.domain.service.TaskRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,6 +38,9 @@ public class ProjectTaskController {
     @Autowired
     private TaskInputDisassembler taskInputDisassembler;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<TaskSummaryModel> list(@PathVariable Long projectId) {
@@ -49,15 +54,17 @@ public class ProjectTaskController {
         return taskModelAssembler.toModel(taskRegisterService.findByIdOrFail(projectId, taskId));
     }
 
+    @Transactional
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TaskModel insert(@PathVariable Long projectId, @RequestBody @Valid TaskInput taskInput) {
         Project project = projectRegisterService.findByIdOrFail(projectId);
         Task task = taskInputDisassembler.toDomainObject(taskInput);
         task.setProject(project);
-        return taskModelAssembler.toModel(taskRegisterService.save(task));
+        return taskModelAssembler.toModel(taskRepository.save(task));
     }
 
+    @Transactional
     @PutMapping("/{taskId}")
     @ResponseStatus(HttpStatus.OK)
     public TaskModel update(
@@ -67,14 +74,13 @@ public class ProjectTaskController {
     ) {
         Task taskToUpdate = taskRegisterService.findByIdOrFail(projectId, taskId);
         taskInputDisassembler.copyToDomainObject(taskInput, taskToUpdate);
-        return taskModelAssembler.toModel(taskRegisterService.save(taskToUpdate));
+        return taskModelAssembler.toModel(taskRepository.save(taskToUpdate));
     }
 
     @DeleteMapping("/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long projectId, @PathVariable Long taskId) {
-        Task task = taskRegisterService.findByIdOrFail(projectId, taskId);
-        taskRegisterService.delete(task);
+        taskRegisterService.deleteById(projectId, taskId);
     }
 
 }

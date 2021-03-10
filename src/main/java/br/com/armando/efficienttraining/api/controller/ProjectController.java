@@ -9,6 +9,7 @@ import br.com.armando.efficienttraining.domain.repository.ProjectRepository;
 import br.com.armando.efficienttraining.domain.service.ProjectRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ public class ProjectController {
         return projectModelAssembler.toModel(projectRegisterService.findByIdOrFail(projectId));
     }
 
+    @Transactional
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectModel insert(@RequestBody @Valid ProjectInput projectInput) {
@@ -49,6 +51,7 @@ public class ProjectController {
         return projectModelAssembler.toModel(projectRepository.save(project));
     }
 
+    @Transactional
     @PutMapping("/{projectId}")
     @ResponseStatus(HttpStatus.OK)
     public ProjectModel update(@RequestBody @Valid ProjectInput projectInput, @PathVariable Long projectId) {
@@ -60,8 +63,7 @@ public class ProjectController {
     @DeleteMapping("/{projectId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long projectId) {
-        Project project = projectRegisterService.findByIdOrFail(projectId);
-        projectRepository.delete(project);
+        projectRegisterService.delete(projectId);
     }
 
 }
