@@ -37,7 +37,7 @@ public class Task {
     @Column(nullable = false, columnDefinition = "datetime")
     private OffsetDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
