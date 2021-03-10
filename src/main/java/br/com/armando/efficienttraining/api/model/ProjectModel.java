@@ -13,5 +13,7 @@ public class ProjectModel {
    private String name;
    private String description;
    private OffsetDateTime createdAt;
+   private Integer totalTasks;
+   private Integer progress;
 
 }
