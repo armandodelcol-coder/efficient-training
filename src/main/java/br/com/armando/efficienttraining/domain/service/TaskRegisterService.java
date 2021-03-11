@@ -1,9 +1,11 @@
 package br.com.armando.efficienttraining.domain.service;
 
 import br.com.armando.efficienttraining.domain.exception.EntityNotFoundException;
+import br.com.armando.efficienttraining.domain.model.Project;
 import br.com.armando.efficienttraining.domain.model.Task;
 import br.com.armando.efficienttraining.domain.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +17,33 @@ public class TaskRegisterService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public Task findByIdOrFail(Long projectId, Long taskId) {
-        Optional<Task> task = taskRepository.findById(projectId, taskId);
+    @Autowired
+    private ProjectRegisterService projectRegisterService;
+
+    public Task findByIdOrFail(Long taskId) {
+        Optional<Task> task = taskRepository.findById(taskId);
         return task.orElseThrow(() -> new EntityNotFoundException(
-                String.format("Não foi encontrado uma Task de id %d no projeto de id %d", taskId, projectId)
+                String.format("Não foi encontrado uma Task de id %d", taskId)
         ));
     }
 
     @Transactional
-    public void deleteById(Long projectId, Long taskId) {
-        Task task = findByIdOrFail(projectId, taskId);
-        taskRepository.delete(task);
+    public Task save(Task task) {
+        Long projectId = task.getProject().getId();
+        Project project = projectRegisterService.findByIdOrFail(projectId);
+        task.setProject(project);
+        return taskRepository.save(task);
     }
+
+    @Transactional
+    public void deleteById(Long taskId) {
+        try {
+            taskRepository.deleteById(taskId);
+            taskRepository.flush();
+        }
+        catch (EmptyResultDataAccessException e) {
+            throw new EntityNotFoundException("");
+        }
+    }
+
 }

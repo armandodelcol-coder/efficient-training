@@ -1,6 +1,7 @@
 package br.com.armando.efficienttraining.api.disassembler;
 
 import br.com.armando.efficienttraining.api.model.input.TaskInput;
+import br.com.armando.efficienttraining.domain.model.Project;
 import br.com.armando.efficienttraining.domain.model.Task;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class TaskInputDisassembler {
     }
 
     public void copyToDomainObject(TaskInput taskInput, Task task) {
+        task.setProject(new Project());
+
         modelMapper.map(taskInput, task);
     }
 
