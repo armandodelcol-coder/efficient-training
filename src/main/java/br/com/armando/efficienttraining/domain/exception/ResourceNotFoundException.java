@@ -1,10 +1,10 @@
 package br.com.armando.efficienttraining.domain.exception;
 
-public class EntityInUseException extends BusinessException {
+public abstract class ResourceNotFoundException extends BusinessException {
 
     private static final long serialVersionUID = 1L;
 
-    public EntityInUseException(String message) {
+    public ResourceNotFoundException(String message) {
         super(message);
     }
 }

@@ -7,7 +7,7 @@ import br.com.armando.efficienttraining.api.model.TaskModel;
 import br.com.armando.efficienttraining.api.model.TaskSummaryModel;
 import br.com.armando.efficienttraining.api.model.input.TaskInput;
 import br.com.armando.efficienttraining.domain.exception.BusinessException;
-import br.com.armando.efficienttraining.domain.exception.EntityNotFoundException;
+import br.com.armando.efficienttraining.domain.exception.ResourceNotFoundException;
 import br.com.armando.efficienttraining.domain.model.Task;
 import br.com.armando.efficienttraining.domain.repository.TaskRepository;
 import br.com.armando.efficienttraining.domain.service.TaskRegisterService;
@@ -55,8 +55,8 @@ public class TaskController {
         try {
             Task task = taskInputDisassembler.toDomainObject(taskInput);
             return taskModelAssembler.toModel(taskRegisterService.save(task));
-        } catch (EntityNotFoundException e) {
-            throw new BusinessException(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            throw new BusinessException(e.getMessage(), e);
         }
     }
 
@@ -70,8 +70,8 @@ public class TaskController {
         taskInputDisassembler.copyToDomainObject(taskInput, taskToUpdate);
         try {
             return taskModelAssembler.toModel(taskRegisterService.save(taskToUpdate));
-        } catch (EntityNotFoundException e) {
-            throw new BusinessException(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            throw new BusinessException(e.getMessage(), e);
         }
     }
 

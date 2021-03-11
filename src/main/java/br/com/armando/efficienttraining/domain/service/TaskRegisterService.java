@@ -1,6 +1,6 @@
 package br.com.armando.efficienttraining.domain.service;
 
-import br.com.armando.efficienttraining.domain.exception.EntityNotFoundException;
+import br.com.armando.efficienttraining.domain.exception.TaskNotFoundException;
 import br.com.armando.efficienttraining.domain.model.Project;
 import br.com.armando.efficienttraining.domain.model.Task;
 import br.com.armando.efficienttraining.domain.repository.TaskRepository;
@@ -22,9 +22,7 @@ public class TaskRegisterService {
 
     public Task findByIdOrFail(Long taskId) {
         Optional<Task> task = taskRepository.findById(taskId);
-        return task.orElseThrow(() -> new EntityNotFoundException(
-                String.format("Não foi encontrado uma Task de id %d", taskId)
-        ));
+        return task.orElseThrow(() -> new TaskNotFoundException(taskId));
     }
 
     @Transactional
@@ -42,7 +40,7 @@ public class TaskRegisterService {
             taskRepository.flush();
         }
         catch (EmptyResultDataAccessException e) {
-            throw new EntityNotFoundException("");
+            throw new TaskNotFoundException(taskId);
         }
     }
 
