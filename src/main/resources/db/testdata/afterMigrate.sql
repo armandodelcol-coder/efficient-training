@@ -2,11 +2,13 @@ SET foreign_key_checks = 0;
 
 DELETE FROM project;
 DELETE FROM task;
+DELETE FROM task_resource;
 
 SET foreign_key_checks = 1;
 
 ALTER TABLE project auto_increment = 1;
 ALTER TABLE task auto_increment = 1;
+ALTER TABLE task_resource auto_increment = 1;
 
 INSERT INTO project
 (name, description, created_at)
@@ -27,7 +29,6 @@ VALUES (
     utc_timestamp,
     1
 );
-
 INSERT INTO task
 (name, description, complexity_level, status, created_at, project_id)
 VALUES (
@@ -38,7 +39,6 @@ VALUES (
     utc_timestamp,
     1
 );
-
 INSERT INTO task
 (name, description, complexity_level, status, created_at, project_id)
 VALUES (
@@ -48,4 +48,43 @@ VALUES (
     "DONE",
     utc_timestamp,
     1
+);
+
+INSERT INTO project
+(name, description, created_at)
+VALUES (
+    "Criar um sistema de controle de gastos pessoais",
+    "Um sistema simples para cadastrar entradas, saídas, planejamentos financeiros, objetivos de compra, etc.",
+    utc_timestamp
+);
+INSERT INTO task
+(name, description, complexity_level, observation, status, created_at, project_id)
+VALUES (
+    "Fazer o Brainstorm",
+    "Tirar da cabeça as ideias relacionadas ao sistema sem se importar com nenhum tipo de ordem de execução, dificuldade de implementação, possíbilidade, etc.",
+    2,
+    "Não é necessário um documento formal e extramente organizado, porém é preciso manter um sentido relacionado ao sistema",
+    "TO_DO",
+    utc_timestamp,
+    2
+);
+INSERT INTO task
+(name, description, complexity_level, observation, status, created_at, project_id)
+VALUES (
+    "Definir a UML",
+    "Definir a UML para documentar e nortear o desenvolvimento do sistema, esse passo é super importante",
+    2,
+    "Costumo utilizar o StarUML",
+    "TO_DO",
+    utc_timestamp,
+    2
+);
+
+INSERT INTO task_resource
+(name, description, status, task_id)
+VALUES (
+    "Capturar ideias",
+    "A ideia aqui é conversar com pessoas sobre planejamento financeiro e entender como elas imaginam controlar suas contas pessoas de uma forma fácil e produtiva, tendo em vista objetivos especificos",
+    "MESSY",
+    4
 );

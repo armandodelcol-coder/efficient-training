@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -40,5 +42,8 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
+    @OneToMany(mappedBy = "task")
+    private List<TaskResource> resources = new ArrayList<>();
 
 }

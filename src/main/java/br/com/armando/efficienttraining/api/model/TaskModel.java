@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,5 +17,6 @@ public class TaskModel {
     private String observation;
     private OffsetDateTime createdAt;
     private String status;
+    private List<TaskResourceModel> resources;
 
 }
