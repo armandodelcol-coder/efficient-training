@@ -17,6 +17,8 @@ public class TaskModel {
     private String observation;
     private OffsetDateTime createdAt;
     private String status;
+    private OffsetDateTime doingStartedAt;
+    private OffsetDateTime doneAt;
     private List<TaskResourceModel> resources;
 
 }

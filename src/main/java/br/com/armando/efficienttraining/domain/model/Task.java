@@ -1,5 +1,6 @@
 package br.com.armando.efficienttraining.domain.model;
 
+import br.com.armando.efficienttraining.domain.exception.BusinessException;
 import br.com.armando.efficienttraining.domain.model.enums.TaskStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,12 @@ public class Task {
     @Column(nullable = false, columnDefinition = "datetime")
     private OffsetDateTime createdAt;
 
+    @Column(columnDefinition = "datetime")
+    private OffsetDateTime doingStartedAt;
+
+    @Column(columnDefinition = "datetime")
+    private OffsetDateTime doneAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
@@ -46,4 +53,24 @@ public class Task {
     @OneToMany(mappedBy = "task")
     private List<TaskResource> resources = new ArrayList<>();
 
+    public void doing() {
+        setStatus(TaskStatus.DOING);
+        setDoingStartedAt(OffsetDateTime.now());
+    }
+
+    public void done() {
+        setStatus(TaskStatus.DONE);
+        setDoneAt(OffsetDateTime.now());
+    }
+
+    private void setStatus(TaskStatus newStatus) {
+        if (getStatus().cantChangeStatusTo(newStatus)) {
+            throw new BusinessException(
+                    String.format("O Status não pode ser alterado de %s para %s",
+                            getStatus().getDescription(),
+                            newStatus.getDescription())
+            );
+        }
+        this.status = newStatus;
+    }
 }

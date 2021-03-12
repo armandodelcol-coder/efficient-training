@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum TaskStatus {
 
-    TO_DO("To do"),
+    TO_DO("To-do"),
     DOING("Doing", TO_DO),
     DONE("Done", DOING);
 
@@ -21,7 +21,7 @@ public enum TaskStatus {
         return this.description;
     }
 
-    public boolean canChangeStatusTo(TaskStatus newStatus) {
+    public boolean cantChangeStatusTo(TaskStatus newStatus) {
         return !newStatus.taskStatusList.contains(this);
     }
 
