@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.util.List;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -29,5 +30,8 @@ public class TaskResource {
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
+
+    @OneToMany(mappedBy = "taskResource")
+    private List<TaskResourceReference> references;
 
 }

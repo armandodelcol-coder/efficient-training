@@ -3,12 +3,14 @@ SET foreign_key_checks = 0;
 DELETE FROM project;
 DELETE FROM task;
 DELETE FROM task_resource;
+DELETE FROM task_resource_reference;
 
 SET foreign_key_checks = 1;
 
 ALTER TABLE project auto_increment = 1;
 ALTER TABLE task auto_increment = 1;
 ALTER TABLE task_resource auto_increment = 1;
+ALTER TABLE task_resource_reference auto_increment = 1;
 
 INSERT INTO project
 (name, description, created_at)
@@ -87,4 +89,27 @@ VALUES (
     "A ideia aqui é conversar com pessoas sobre planejamento financeiro e entender como elas imaginam controlar suas contas pessoas de uma forma fácil e produtiva, tendo em vista objetivos especificos",
     "MESSY",
     4
+);
+
+INSERT INTO task_resource
+(name, description, status, task_id)
+VALUES (
+    "Ver exemplos",
+    "Exemplos de docuemntações UML",
+    "MESSY",
+    5
+);
+INSERT INTO task_resource_reference
+(link, description, task_resource_id)
+VALUES (
+    "http://link-ficticio.com.br/uml",
+    "UML de um projeto X",
+    2
+);
+INSERT INTO task_resource_reference
+(link, description, task_resource_id)
+VALUES (
+    "http://link-ficticio.com.br/uml",
+    "UML de um projeto Y",
+    2
 );

@@ -1,8 +1,10 @@
 package br.com.armando.efficienttraining.api.controller;
 
 import br.com.armando.efficienttraining.api.assembler.TaskResourceModelAssembler;
+import br.com.armando.efficienttraining.api.assembler.TaskResourceWithReferenceModelAssembler;
 import br.com.armando.efficienttraining.api.disassembler.TaskResourceInputDisassembler;
 import br.com.armando.efficienttraining.api.model.TaskResourceModel;
+import br.com.armando.efficienttraining.api.model.TaskResourceWithReferencesModel;
 import br.com.armando.efficienttraining.api.model.input.TaskResourceInput;
 import br.com.armando.efficienttraining.domain.exception.BusinessException;
 import br.com.armando.efficienttraining.domain.exception.ResourceNotFoundException;
@@ -32,6 +34,10 @@ public class TaskResourceController {
     @Autowired
     TaskResourceInputDisassembler taskResourceInputDisassembler;
 
+    @Autowired
+    TaskResourceWithReferenceModelAssembler taskResourceWithReferenceModelAssembler;
+
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<TaskResourceModel> list() {
@@ -40,8 +46,8 @@ public class TaskResourceController {
 
     @GetMapping("/{taskResourceId}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskResourceModel findById(@PathVariable Long taskResourceId) {
-        return taskResourceModelAssembler.toModel(taskResourceRegisterService.findByIdOrFail(taskResourceId));
+    public TaskResourceWithReferencesModel findById(@PathVariable Long taskResourceId) {
+        return taskResourceWithReferenceModelAssembler.toModel(taskResourceRegisterService.findByIdOrFail(taskResourceId));
     }
 
     @PostMapping
