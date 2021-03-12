@@ -5,12 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TaskResourceModel {
+public class TaskResourceSummaryModel {
 
     private Long id;
     private String name;
-    private String description;
     private String status;
-    private TaskSummaryModel task;
 
 }
