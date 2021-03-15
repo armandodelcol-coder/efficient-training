@@ -11,4 +11,8 @@ public class TaskResourceReferenceNotFoundException extends ResourceNotFoundExce
     public TaskResourceReferenceNotFoundException(Long id, Long resourceId) {
         super(String.format("Não foi encontrada uma referência de código %d do recurso com o código %d", id, resourceId));
     }
+
+    public TaskResourceReferenceNotFoundException(Long id) {
+        super(String.format("Não foi encontrada uma referência de código %d", id));
+    }
 }

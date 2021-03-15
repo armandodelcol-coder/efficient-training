@@ -57,7 +57,7 @@ public class TaskResourceReferenceController {
             @RequestBody @Valid TaskResourceReferenceInput taskResourceReferenceInput
     ) {
         TaskResource taskResource = taskResourceRegisterService.findByIdOrFail(taskResourceId);
-        TaskResourceReference taskResourceReferenceToUpdate = taskResourceReferenceRegisterService.findByIdOrFail(referenceId, taskResourceId);
+        TaskResourceReference taskResourceReferenceToUpdate = taskResourceReferenceRegisterService.findByIdAndResourceIdOrFail(referenceId, taskResourceId);
         taskResourceReferenceInputDisassembler.copyToDomainObject(taskResourceReferenceInput, taskResourceReferenceToUpdate);
         taskResourceReferenceToUpdate.setTaskResource(taskResource);
         return  taskResourceReferenceModelAssembler.toModel(taskResourceReferenceRepository.save(taskResourceReferenceToUpdate));

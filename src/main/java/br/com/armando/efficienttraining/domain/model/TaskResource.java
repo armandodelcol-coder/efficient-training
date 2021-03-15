@@ -34,4 +34,17 @@ public class TaskResource {
     @OneToMany(mappedBy = "taskResource")
     private List<TaskResourceReference> references;
 
+    public void messy() {
+        setStatus(TaskResourceStatus.MESSY);
+    }
+
+    public void learning() {
+        setStatus(TaskResourceStatus.LEARNING);
+    }
+
+    public void learned() {
+        setStatus(TaskResourceStatus.LEARNED);
+    }
+
+
 }
