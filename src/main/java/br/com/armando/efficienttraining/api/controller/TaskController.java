@@ -2,9 +2,11 @@ package br.com.armando.efficienttraining.api.controller;
 
 import br.com.armando.efficienttraining.api.assembler.TaskModelAssembler;
 import br.com.armando.efficienttraining.api.assembler.TaskSummaryModelAssembler;
+import br.com.armando.efficienttraining.api.assembler.TaskSummaryWithProjectModelAssembler;
 import br.com.armando.efficienttraining.api.disassembler.TaskInputDisassembler;
 import br.com.armando.efficienttraining.api.model.TaskModel;
 import br.com.armando.efficienttraining.api.model.TaskSummaryModel;
+import br.com.armando.efficienttraining.api.model.TaskSummaryWithProjectModel;
 import br.com.armando.efficienttraining.api.model.input.TaskInput;
 import br.com.armando.efficienttraining.domain.exception.BusinessException;
 import br.com.armando.efficienttraining.domain.exception.ResourceNotFoundException;
@@ -37,10 +39,13 @@ public class TaskController {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private TaskSummaryWithProjectModelAssembler taskSummaryWithProjectModelAssembler;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TaskSummaryModel> list() {
-        return taskSummaryModelAssembler.toCollectionModel(taskRepository.findAll());
+    public List<TaskSummaryWithProjectModel> list() {
+        return taskSummaryWithProjectModelAssembler.toCollectionModel(taskRepository.findAll());
     }
 
     @GetMapping("/{taskId}")
