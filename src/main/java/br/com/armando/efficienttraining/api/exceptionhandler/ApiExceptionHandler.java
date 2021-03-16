@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,9 @@ import java.util.stream.Collectors;
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String MSG_ERROR_GENERIC = "Internal Server Error, Try again or contact the system administrator.";
+
+    @Autowired
+    private MessageSource messageSource;
 
     //My Custom Exception Classes
 
@@ -104,10 +110,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         BindingResult bindingResult = e.getBindingResult();
         List<Problem.Object> fields = bindingResult.getFieldErrors().stream()
-                .map(fieldError -> Problem.Object.builder()
-                .name(fieldError.getField())
-                .userMessage(fieldError.getDefaultMessage())
-                .build()).collect(Collectors.toList());
+                .map(fieldError -> {
+                    String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+
+                    return Problem.Object.builder()
+                            .name(fieldError.getField())
+                            .userMessage(message)
+                            .build();
+                })
+                .collect(Collectors.toList());
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .objects(fields)
