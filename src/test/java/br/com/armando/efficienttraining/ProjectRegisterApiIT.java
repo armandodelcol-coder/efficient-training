@@ -1,18 +1,26 @@
 package br.com.armando.efficienttraining;
 
 import br.com.armando.efficienttraining.domain.model.Project;
+import br.com.armando.efficienttraining.domain.model.Task;
 import br.com.armando.efficienttraining.domain.repository.ProjectRepository;
+import br.com.armando.efficienttraining.domain.service.TaskRegisterService;
+import br.com.armando.efficienttraining.util.DatabaseCleaner;
 import br.com.armando.efficienttraining.util.ResourceUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-import br.com.armando.efficienttraining.util.DatabaseCleaner;
+
+import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,6 +37,9 @@ public class ProjectRegisterApiIT {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private TaskRegisterService taskRegisterService;
 
     private int totalProjects;
     private Project projectTest1;
@@ -47,7 +58,7 @@ public class ProjectRegisterApiIT {
     }
 
     @BeforeEach
-    public void clearTables() {
+    public void clearTablesAndPrepareData() {
         databaseCleaner.clearTables();
         prepareData();
     }
@@ -73,7 +84,8 @@ public class ProjectRegisterApiIT {
     }
 
     @Test
-    public void shouldReturn201_WhenRegisterProject() {
+    public void shouldReturn201AndCorrectBody_WhenRegisterProject() {
+        Map<String, Object> jsonMap = new GsonJsonParser().parseMap(jsonNewProjectCorrectData);
         RestAssured.given()
                 .body(jsonNewProjectCorrectData)
                 .contentType(ContentType.JSON)
@@ -81,7 +93,9 @@ public class ProjectRegisterApiIT {
                 .when()
                 .post()
                 .then()
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value())
+                .body("name", Matchers.equalTo(jsonMap.get("name")))
+                .body("description", Matchers.equalTo(jsonMap.get("description")));
     }
 
     @Test
@@ -107,6 +121,28 @@ public class ProjectRegisterApiIT {
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
+    @Test
+    public void shouldReturn409_WhenDeleteProjectInUse() {
+        RestAssured.given()
+                .pathParam("projectId", projectTest1.getId())
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value());
+    }
+
+    @Test
+    public void shouldReturn404_WhenDeleteProjectNotFound() {
+        RestAssured.given()
+                .pathParam("projectId", PROJECT_ID_NOT_EXISTENT)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
     private void prepareData() {
         projectTest1 = new Project();
         projectTest1.setName("Projeto 1");
@@ -115,6 +151,14 @@ public class ProjectRegisterApiIT {
         projectTest2 = new Project();
         projectTest2.setName("Projeto 2");
         projectRepository.save(projectTest2);
+
+        Task task1 = new Task();
+        task1.setName("Teste deletar Projeto em uso");
+        task1.setDescription("Apenas testando");
+        task1.setComplexityLevel(1);
+        task1.setProject(projectTest1);
+        taskRegisterService.save(task1);
+
 
         totalProjects = 2;
     }
