@@ -86,21 +86,6 @@ public class ProjectRegisterApiIT {
     }
 
     @Test
-    public void shouldReturn201AndCorrectBody_WhenRegisterProject() {
-        Map<String, Object> jsonMap = new GsonJsonParser().parseMap(jsonNewProjectCorrectData);
-        RestAssured.given()
-                .body(jsonNewProjectCorrectData)
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .when()
-                .post()
-                .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .body("name", Matchers.equalTo(jsonMap.get("name")))
-                .body("description", Matchers.equalTo(jsonMap.get("description")));
-    }
-
-    @Test
     public void shouldReturnCorrectData_WhenConsultProjectExistent() {
         RestAssured.given()
                 .pathParam("projectId", projectTest1.getId())
@@ -124,25 +109,30 @@ public class ProjectRegisterApiIT {
     }
 
     @Test
-    public void shouldReturn409_WhenDeleteProjectInUse() {
+    public void shouldReturn201AndCorrectBody_WhenRegisterProject() {
+        Map<String, Object> jsonMap = new GsonJsonParser().parseMap(jsonNewProjectCorrectData);
         RestAssured.given()
-                .pathParam("projectId", projectTest1.getId())
+                .body(jsonNewProjectCorrectData)
+                .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .delete("/{projectId}")
+                .post()
                 .then()
-                .statusCode(HttpStatus.CONFLICT.value());
+                .statusCode(HttpStatus.CREATED.value())
+                .body("name", Matchers.equalTo(jsonMap.get("name")))
+                .body("description", Matchers.equalTo(jsonMap.get("description")));
     }
 
     @Test
-    public void shouldReturn404_WhenDeleteProjectNotFound() {
+    public void shouldReturn400_WhenInsertProjectWithInvalidData() {
         RestAssured.given()
-                .pathParam("projectId", PROJECT_ID_NOT_EXISTENT)
+                .body(jsonNewProjectWithInvalidProperty)
+                .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .delete("/{projectId}")
+                .post()
                 .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -182,6 +172,28 @@ public class ProjectRegisterApiIT {
                 .put("/{projectId}")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void shouldReturn409_WhenDeleteProjectInUse() {
+        RestAssured.given()
+                .pathParam("projectId", projectTest1.getId())
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value());
+    }
+
+    @Test
+    public void shouldReturn404_WhenDeleteProjectNotFound() {
+        RestAssured.given()
+                .pathParam("projectId", PROJECT_ID_NOT_EXISTENT)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     private void prepareData() {

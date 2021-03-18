@@ -1,10 +1,12 @@
 package br.com.armando.efficienttraining.domain.service;
 
+import br.com.armando.efficienttraining.domain.exception.EntityInUseException;
 import br.com.armando.efficienttraining.domain.exception.TaskNotFoundException;
 import br.com.armando.efficienttraining.domain.model.Project;
 import br.com.armando.efficienttraining.domain.model.Task;
 import br.com.armando.efficienttraining.domain.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,11 @@ public class TaskRegisterService {
         }
         catch (EmptyResultDataAccessException e) {
             throw new TaskNotFoundException(taskId);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new EntityInUseException(
+                    String.format("A task de código %d não pode ser removida, pois, está em uso.", taskId)
+            );
         }
     }
 

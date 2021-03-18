@@ -2,7 +2,9 @@ package br.com.armando.efficienttraining;
 
 import br.com.armando.efficienttraining.domain.model.Project;
 import br.com.armando.efficienttraining.domain.model.Task;
+import br.com.armando.efficienttraining.domain.model.TaskResource;
 import br.com.armando.efficienttraining.domain.repository.ProjectRepository;
+import br.com.armando.efficienttraining.domain.repository.TaskResourceRepository;
 import br.com.armando.efficienttraining.domain.service.TaskRegisterService;
 import br.com.armando.efficienttraining.util.DatabaseCleaner;
 import br.com.armando.efficienttraining.util.ResourceUtils;
@@ -40,6 +42,9 @@ public class TaskRegisterApiIT {
 
     @Autowired
     private TaskRegisterService taskRegisterService;
+
+    @Autowired
+    private TaskResourceRepository taskResourceRepository;
 
     private int totalTasks;
     private Project projectTest1;
@@ -148,6 +153,78 @@ public class TaskRegisterApiIT {
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
+    @Test
+    public void shouldReturn400_WhenUpdateTaskWithInvalidData() {
+        RestAssured.given()
+                .pathParam("taskId", taskTest1.getId())
+                .body(jsonNewTaskWithInvalidData)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .put("/{taskId}")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void shouldReturn204_WhenDeleteTask() {
+        RestAssured.given()
+                .pathParam("taskId", taskTest2.getId())
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{taskId}")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void shouldReturn404_WhenDeleteTaskNotFound() {
+        RestAssured.given()
+                .pathParam("taskId", TASK_ID_NOT_EXISTENT)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{taskId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void shouldReturn409_WhenDeleteTaskInUse() {
+        RestAssured.given()
+                .pathParam("taskId", taskTest1.getId())
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/{taskId}")
+                .then()
+                .statusCode(HttpStatus.CONFLICT.value());
+    }
+
+    @Test
+    public void shouldReturn400_WhenSetStatusToDoToDone() {
+        RestAssured.given()
+                .pathParam("taskId", taskTest1.getId())
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .put("/{taskId}/done")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void shouldReturn204_WhenSetStatusToDoToDoing() {
+        RestAssured.given()
+                .pathParam("taskId", taskTest1.getId())
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .put("/{taskId}/doing")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
 
     @BeforeEach
     public void clearTablesAndPrepareData() {
@@ -178,6 +255,11 @@ public class TaskRegisterApiIT {
         taskTest2.setProject(projectTest1);
         taskRegisterService.save(taskTest2);
 
+        TaskResource taskResource = new TaskResource();
+        taskResource.setName("Task Resource");
+        taskResource.setDescription("Task Resource Description");
+        taskResource.setTask(taskTest1);
+        taskResourceRepository.save(taskResource);
 
         totalTasks = 2;
     }
