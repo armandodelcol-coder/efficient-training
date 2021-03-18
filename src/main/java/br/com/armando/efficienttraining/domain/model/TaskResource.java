@@ -31,7 +31,7 @@ public class TaskResource {
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
-    @OneToMany(mappedBy = "taskResource")
+    @OneToMany(mappedBy = "taskResource", cascade = CascadeType.REMOVE)
     private List<TaskResourceReference> references;
 
     public void messy() {
