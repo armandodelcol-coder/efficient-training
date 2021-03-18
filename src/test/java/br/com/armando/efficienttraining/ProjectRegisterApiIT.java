@@ -47,6 +47,7 @@ public class ProjectRegisterApiIT {
 
     // Json
     private String jsonNewProjectCorrectData;
+    private String jsonNewProjectWithInvalidProperty;
 
     @BeforeAll
     public void setUp() {
@@ -55,6 +56,7 @@ public class ProjectRegisterApiIT {
         RestAssured.basePath = "/projects";
 
         jsonNewProjectCorrectData = ResourceUtils.getContentFromResource("/json/newProjectCorrectData.json");
+        jsonNewProjectWithInvalidProperty = ResourceUtils.getContentFromResource("/json/newProjectWithInvalidProperty.json");
     }
 
     @BeforeEach
@@ -99,7 +101,7 @@ public class ProjectRegisterApiIT {
     }
 
     @Test
-    public void shouldReturnCorrect_WhenConsultProjectExistent() {
+    public void shouldReturnCorrectData_WhenConsultProjectExistent() {
         RestAssured.given()
                 .pathParam("projectId", projectTest1.getId())
                 .accept(ContentType.JSON)
@@ -107,7 +109,7 @@ public class ProjectRegisterApiIT {
                 .get("/{projectId}")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("name", Matchers.equalTo("Projeto 1"));
+                .body("name", Matchers.equalTo(projectTest1.getName()));
     }
 
     @Test
@@ -141,6 +143,45 @@ public class ProjectRegisterApiIT {
                 .delete("/{projectId}")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void shouldReturn200_WhenUpdateProjectWithCorrectData() {
+        RestAssured.given()
+                .pathParam("projectId", projectTest1.getId())
+                .body(jsonNewProjectCorrectData)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .put("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    public void shouldReturn404_WhenUpdateProjectNotFound() {
+        RestAssured.given()
+                .pathParam("projectId", PROJECT_ID_NOT_EXISTENT)
+                .body(jsonNewProjectCorrectData)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .put("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void shouldReturn400_WhenUpdateProjectWithInvalidData() {
+        RestAssured.given()
+                .pathParam("projectId", projectTest1.getId())
+                .body(jsonNewProjectWithInvalidProperty)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .put("/{projectId}")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     private void prepareData() {
